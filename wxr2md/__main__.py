@@ -28,6 +28,7 @@ class Post:
     post_date: str
     post_modified: str
     categories: list[str]
+    draft: bool
 
     def from_element(element: ElementTree.Element):
         """Create a post from an XML element"""
@@ -38,6 +39,7 @@ class Post:
         post_date = element.find("wp:post_date_gmt", NAMESPACES).text
         post_modified = element.find("wp:post_modified_gmt", NAMESPACES).text
         categories = [e.text for e in element.findall("category")]
+        draft = element.find("wp:status", NAMESPACES).text == "draft"
 
         return Post(
             title=title,
@@ -47,6 +49,7 @@ class Post:
             post_date=post_date,
             post_modified=post_modified,
             categories=categories,
+            draft=draft,
         )
 
     def metadata_md(self) -> str:
@@ -57,12 +60,13 @@ class Post:
         md += f"title: {self.title}\n"
         md += f"post_date: {self.post_date}\n"
         md += f"post_modified: {self.post_modified}\n"
-        md += f"categories: {','.join(self.categories)}\n"
+        md += f"categories: {self.categories}\n"
+        if self.draft:
+            md += f"draft: {self.draft}\n"
 
-        md +=  "---\n\n"
+        md += "---\n\n"
 
         return md
-
 
     def to_md(self) -> str:
         """Convert post into a markdown string"""
@@ -106,5 +110,9 @@ if __name__ == "__main__":
     out_dir.mkdir(exist_ok=True, parents=True)
 
     for post in blog.posts:
-        file = out_dir / f"{post.id}-{post.name}.md"
+        if post.draft:
+            filename = f"draft-{post.id}-{post.name}.md"
+        else:
+            filename = f"{post.id}-{post.name}.md"
+        file = out_dir / filename
         file.write_text(post.to_md())
