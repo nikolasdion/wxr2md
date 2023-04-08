@@ -52,30 +52,33 @@ class Post:
             draft=draft,
         )
 
-    def metadata_md(self) -> str:
-        """Generate YAML metadata to be included in the markdown string"""
-        md = "---\n"
+    def metadata_lines(self) -> list[str]:
+        """Generate YAML metadata lines to be included in the markdown string"""
+        lines = []
+        lines.append("---")
 
-        md += f"id: {self.id}\n"
-        md += f"title: {self.title}\n"
-        md += f"post_date: {self.post_date}\n"
-        md += f"post_modified: {self.post_modified}\n"
-        md += f"categories: {self.categories}\n"
+        lines.append(f"id: {self.id}")
+        lines.append(f"title: {self.title}")
+        lines.append(f"post_date: {self.post_date}")
+        lines.append(f"post_modified: {self.post_modified}")
+        lines.append(f"categories: {self.categories}")
         if self.draft:
-            md += f"draft: {self.draft}\n"
+            lines.append(f"draft: {self.draft}")
 
-        md += "---\n\n"
+        lines.append("---")
 
-        return md
+        return lines
 
     def to_md(self) -> str:
         """Convert post into a markdown string"""
-        md = self.metadata_md()
+        lines = self.metadata_lines()
 
-        md += f"# {self.title}\n\n"
-        md += f"{self.content}"
+        lines.append("")
+        lines.append(f"# {self.title}")
+        lines.append("")
+        lines.append(f"{self.content}")
 
-        return md
+        return "\n".join(lines)
 
 
 @dataclass
