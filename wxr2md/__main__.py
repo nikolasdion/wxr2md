@@ -30,6 +30,7 @@ class Post:
     categories: list[str]
 
     def from_element(element: ElementTree.Element):
+        """Create a post from an XML element"""
         title = element.find("title").text
         name = element.find("wp:post_name", NAMESPACES).text
         id = element.find("wp:post_id", NAMESPACES).text
@@ -48,17 +49,26 @@ class Post:
             categories=categories,
         )
 
+    def metadata_md(self) -> str:
+        """Generate YAML metadata to be included in the markdown string"""
+        md = "---\n"
+
+        md += f"id: {self.id}\n"
+        md += f"title: {self.title}\n"
+        md += f"post_date: {self.post_date}\n"
+        md += f"post_modified: {self.post_modified}\n"
+        md += f"categories: {','.join(self.categories)}\n"
+
+        md +=  "---\n\n"
+
+        return md
+
+
     def to_md(self) -> str:
-        md = ""
+        """Convert post into a markdown string"""
+        md = self.metadata_md()
+
         md += f"# {self.title}\n\n"
-
-        for category in self.categories:
-            md += f"#{category.replace(' ', '-')} "
-        md += "\n\n"
-
-        md += f"Post date: {self.post_date}\n"
-        md += f"Post modified: {self.post_modified}\n\n"
-
         md += f"{self.content}"
 
         return md
