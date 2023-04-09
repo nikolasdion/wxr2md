@@ -6,6 +6,7 @@ authors = ["Dion Susanto <nikolasdion@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 keywords = ["wxr", "wordpress", "markdown"]
+repository = "https://github.com/nikolasdion/wxr2md"
 
 
 [tool.poetry.dependencies]
