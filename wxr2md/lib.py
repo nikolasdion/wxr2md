@@ -77,26 +77,30 @@ class Post:
             is_draft=is_draft,
         )
 
-    def md_metadata(self) -> str:
+    def md_frontmatter(self) -> str:
         """Generate YAML metadata lines to be included in the markdown string"""
         lines = []
         lines.append("---")
         lines.append(f"id: {self.id}")
+        lines.append("layout: post")
         lines.append(f"title: {self.title}")
-        lines.append(f"post_date: {self.post_date}")
-        lines.append(f"post_modified: {self.post_modified}")
-        lines.append(f"categories: {self.categories}")
+        lines.append(f"date: {self.post_date}")
+        lines.append(f"modified: {self.post_modified}")
+        if len(self.categories) > 0:
+            lines.append(f"categories: {self.categories}")
+        if self.is_draft:
+            lines.append("draft: true")
         lines.append("---")
         lines.append("")
         return "\n".join(lines)
 
-    def md_body(self) -> str:
+    def md_body(self, include_title=False, include_date=False) -> str:
         """Generate markdown text body lines"""
         lines = []
-        if self.title is not None:
+        if self.title is not None and include_title:
             lines.append(f"# {self.title}")
             lines.append("")
-        if self.pub_date is not None:
+        if self.pub_date is not None and include_date:
             lines.append(f"_{self.pub_date}_")
             lines.append("")
         if self.content is not None:
@@ -104,12 +108,19 @@ class Post:
             lines.append("")
         return "\n".join(lines)
 
-    def to_md(self) -> str:
+    def to_md(
+        self,
+        frontmatter=True,
+        title_in_body=True,
+        date_in_body=True,
+    ) -> str:
         """Convert post into a markdown string"""
-        metadata = self.md_metadata()
-        body = self.md_body()
-
-        return metadata + "\n" + body
+        md = ""
+        if frontmatter:
+            md += self.md_frontmatter()
+            md += "\n"
+        md += self.md_body(title_in_body, date_in_body)
+        return md
 
 
 @dataclass

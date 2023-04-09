@@ -1,5 +1,9 @@
 # Build output directory
 dist/
 
+out/
+
 .venv/
 **/*/__pycache__/
+
+.DS_Store
