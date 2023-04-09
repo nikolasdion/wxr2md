@@ -26,7 +26,7 @@ if __name__ == "__main__":
         prog="wxr2md",
         description="Convert WordPress eXport RSS (WXR) into Markdown files",
     )
-    parser.add_argument("input")
+    parser.add_argument("input", help="path to the WXR file to be converted")
     parser.add_argument(
         "--out",
         help="output directory, defaults to 'out/' in the current working directory",
