@@ -1,5 +1,5 @@
-out/
-in/
+# Build output directory
 dist/
 
+.venv/
 **/*/__pycache__/
