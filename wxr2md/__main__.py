@@ -21,19 +21,25 @@ DEFAULT_OUTPUT_FOLDER: Path = Path("./out")
 
 @dataclass
 class Post:
-    # title displayed in the content, can be None
-    title: str
-    # name in the URL, useful for filename or unique identifier
-    name: str
-    # unique ID of the post
+    """Represents a WordPress blogpost"""
+
     id: str
+    """Unique ID of the post"""
+    title: str
+    """Title of the post as displayed in the page, can be None"""
+    name: str
+    """Name in the URL of the post"""
     content: str
-    # RFC 822 date format
+    """Content, in markdown format"""
     pub_date: str
+    """From pubDate element, RFC 822 format"""
     post_date: datetime
+    """From wordpress metadata"""
     post_modified: datetime
+    """From wordpress metadata"""
     categories: list[str]
-    draft: bool
+    """List of categories/tags this post is associated with"""
+    is_draft: bool
 
     def from_element(element: ElementTree.Element):
         """Create a post from an XML element"""
@@ -61,7 +67,7 @@ class Post:
             post_modified = None
 
         categories = [e.text for e in element.findall("category")]
-        draft = element.find("wp:status", NAMESPACES).text == "draft"
+        is_draft = element.find("wp:status", NAMESPACES).text == "draft"
 
         return Post(
             title=title,
@@ -72,7 +78,7 @@ class Post:
             post_date=post_date,
             post_modified=post_modified,
             categories=categories,
-            draft=draft,
+            is_draft=is_draft,
         )
 
     def metadata_lines(self) -> list[str]:
@@ -107,10 +113,16 @@ class Post:
 
 @dataclass
 class Blog:
+    """Represents a WordPress blogpost"""
+
     title: str
+    """Title of the blog, as displayed in the webpage"""
     description: str
+    """Description of the blog, as displayed in the webpage"""
     url: str
+    """URL of the blog"""
     posts: list[Post]
+    """List of posts and pages in the blog, including drafts"""
 
     def from_file(input: Path):
         """Create a Blog object from a WXR file"""
@@ -138,7 +150,7 @@ if __name__ == "__main__":
     out_dir.mkdir(exist_ok=True, parents=True)
 
     for post in blog.posts:
-        if post.draft:
+        if post.is_draft:
             filename = f"draft-{post.id}-{post.name}.md"
         else:
             filename = f"{post.post_date.date()}-{post.name}.md"
