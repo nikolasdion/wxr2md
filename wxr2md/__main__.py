@@ -4,6 +4,9 @@ from pathlib import Path
 from xml.etree import ElementTree
 from dataclasses import dataclass
 import sys
+from datetime import datetime
+
+from markdownify import markdownify
 
 NAMESPACES = {
     "content": "http://purl.org/rss/1.0/modules/content/",
@@ -27,8 +30,8 @@ class Post:
     content: str
     # RFC 822 date format
     pub_date: str
-    post_date: str
-    post_modified: str
+    post_date: datetime
+    post_modified: datetime
     categories: list[str]
     draft: bool
 
@@ -38,9 +41,25 @@ class Post:
         name = element.find("wp:post_name", NAMESPACES).text
         id = element.find("wp:post_id", NAMESPACES).text
         content = element.find("content:encoded", NAMESPACES).text
+        if content is not None:
+            content = markdownify(content)
+
         pub_date = element.find("pubDate", NAMESPACES).text
-        post_date = element.find("wp:post_date_gmt", NAMESPACES).text
-        post_modified = element.find("wp:post_modified_gmt", NAMESPACES).text
+
+        try:
+            post_date = datetime.fromisoformat(
+                element.find("wp:post_date_gmt", NAMESPACES).text
+            )
+        except ValueError:
+            post_date = None
+
+        try:
+            post_modified = datetime.fromisoformat(
+                element.find("wp:post_modified_gmt", NAMESPACES).text
+            )
+        except ValueError:
+            post_modified = None
+
         categories = [e.text for e in element.findall("category")]
         draft = element.find("wp:status", NAMESPACES).text == "draft"
 
@@ -73,12 +92,15 @@ class Post:
         """Convert post into a markdown string"""
         lines = self.metadata_lines()
 
-        lines.append("")
-        lines.append(f"# {self.title}")
-        lines.append("")
-        lines.append(f"_{self.pub_date}_")
-        lines.append("")
-        lines.append(f"{self.content}")
+        if self.title is not None:
+            lines.append("")
+            lines.append(f"# {self.title}")
+        if self.pub_date is not None:
+            lines.append("")
+            lines.append(f"_{self.pub_date}_")
+        if self.content is not None:
+            lines.append("")
+            lines.append(f"{self.content}")
 
         return "\n".join(lines)
 
@@ -91,6 +113,7 @@ class Blog:
     posts: list[Post]
 
     def from_file(input: Path):
+        """Create a Blog object from a WXR file"""
         tree = ElementTree.parse(input)
 
         # The root of WXR is an <rss> element, followed by a <channel> element
@@ -118,6 +141,6 @@ if __name__ == "__main__":
         if post.draft:
             filename = f"draft-{post.id}-{post.name}.md"
         else:
-            filename = f"{post.id}-{post.name}.md"
+            filename = f"{post.post_date.date()}-{post.name}.md"
         file = out_dir / filename
         file.write_text(post.to_md())

@@ -10,7 +10,11 @@ keywords = ["wxr", "wordpress", "markdown"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+markdownify = "^0.11.6"
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
 
 [build-system]
 requires = ["poetry-core"]
