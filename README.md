@@ -4,11 +4,21 @@ Convert WordPress exPort RSS (WXR) files to Markdown files.
 
 ## Usage
 
+Install using pip,
+
 ```sh
-wxr2md /path/to/wxr/file [--out /path/to/output/folder]
+pip install wxr2md
 ```
 
-By default, this will output to `out/` folder in the current working directory.
+then run using python
+
+```sh
+python -m wxr2md /path/to/wxr/file [--out /path/to/output/folder]
+```
+
+## Output
+
+By default, the script will output to `out/` folder in the current working directory.
 
 The markdown file output is as follows:
 
@@ -28,7 +38,7 @@ _Mon, 01 Jan 1970 12:34:56 +0000_
 This is the content of the blog post.
 ```
 
-Limitations:
+## Limitations:
 
 - only tested with WXR version 1.2 and a limited set of exports, so might not be compatible for all WXR files
 - `post_date` and `post_modified` is in local timezone, but the date in the markdown body seemed like it's in UTC, even though it's not
