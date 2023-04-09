@@ -25,6 +25,8 @@ class Post:
     # unique ID of the post
     id: str
     content: str
+    # RFC 822 date format
+    pub_date: str
     post_date: str
     post_modified: str
     categories: list[str]
@@ -36,6 +38,7 @@ class Post:
         name = element.find("wp:post_name", NAMESPACES).text
         id = element.find("wp:post_id", NAMESPACES).text
         content = element.find("content:encoded", NAMESPACES).text
+        pub_date = element.find("pubDate", NAMESPACES).text
         post_date = element.find("wp:post_date_gmt", NAMESPACES).text
         post_modified = element.find("wp:post_modified_gmt", NAMESPACES).text
         categories = [e.text for e in element.findall("category")]
@@ -46,6 +49,7 @@ class Post:
             name=name,
             id=id,
             content=content,
+            pub_date=pub_date,
             post_date=post_date,
             post_modified=post_modified,
             categories=categories,
@@ -56,15 +60,11 @@ class Post:
         """Generate YAML metadata lines to be included in the markdown string"""
         lines = []
         lines.append("---")
-
         lines.append(f"id: {self.id}")
         lines.append(f"title: {self.title}")
         lines.append(f"post_date: {self.post_date}")
         lines.append(f"post_modified: {self.post_modified}")
         lines.append(f"categories: {self.categories}")
-        if self.draft:
-            lines.append(f"draft: {self.draft}")
-
         lines.append("---")
 
         return lines
@@ -75,6 +75,8 @@ class Post:
 
         lines.append("")
         lines.append(f"# {self.title}")
+        lines.append("")
+        lines.append(f"_{self.pub_date}_")
         lines.append("")
         lines.append(f"{self.content}")
 
