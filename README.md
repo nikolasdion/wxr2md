@@ -2,7 +2,7 @@
 
 Convert WordPress exPort RSS (WXR) files to Markdown files.
 
-## Usage
+## Installation
 
 Install using pip,
 
@@ -10,10 +10,22 @@ Install using pip,
 pip install wxr2md
 ```
 
-then run using python
+## Usage
 
-```sh
-python -m wxr2md /path/to/wxr/file [--out /path/to/output/folder]
+```
+usage: wxr2md [-h] [--output OUTPUT] [--no-frontmatter] [--title-in-body] [--date-in-body] input
+
+Convert WordPress eXport RSS (WXR) into Markdown files
+
+positional arguments:
+  input             path to the WXR file to be converted
+
+options:
+  -h, --help        show this help message and exit
+  --output OUTPUT   output directory, defaults to 'out/' in the current working directory
+  --no-frontmatter  don't add YAML frontmatter to the markdown file
+  --title-in-body   add title in the markdown body as an Header element
+  --date-in-body    print date at the start of the markdown body
 ```
 
 ## Output
@@ -26,14 +38,14 @@ The markdown file output is as follows:
 ---
 id: 1
 title: Hello, world!
-post_date: 1970-01-01 12:34:56
-post_modified: 1980-02-02 01:02:03
+date: 1970-01-01 12:34:56
+modified: 1980-02-02 01:02:03
 categories: ["a category", "another category"]
 ---
 
-# Hello, world!
+# Hello, world! <!-- If passing in --title-in-body argument -->
 
-_Mon, 01 Jan 1970 12:34:56 +0000_
+_Mon 01 Jan 1970, 12:34_ <!-- If passing in --date-in-body argument -->
 
 This is the content of the blog post.
 ```
@@ -41,10 +53,9 @@ This is the content of the blog post.
 ## Limitations:
 
 - only tested with WXR version 1.2 and a limited set of exports, so might not be compatible for all WXR files
-- `post_date` and `post_modified` is in local timezone, but the date in the markdown body seemed like it's in UTC, even though it's not
-- authors are not included in metadata
+- `date` and `modified` is in local timezone and does not include timezone data
 - blog information is not outputed anywhere (e.g. description, url, etc)
-- no option to customise the format of markdown or file name
+- no option to customise the output file names and folder structures
 
 ## Building
 
