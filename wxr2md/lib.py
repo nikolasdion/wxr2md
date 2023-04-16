@@ -26,15 +26,15 @@ class Post:
     """Name in the URL of the post"""
     content: str
     """Content, in markdown format"""
-    pub_date: str
-    """From pubDate element, RFC 822 format"""
-    post_date: datetime
-    """From wordpress metadata"""
-    post_modified: datetime
-    """From wordpress metadata"""
+    date: datetime
+    """Date posted, from wordpress metadata"""
+    modified: datetime
+    """Date last modified, from wordpress metadata"""
     categories: list[str]
     """List of categories/tags this post is associated with"""
     is_draft: bool
+
+    DATE_IN_BODY_FORMAT = "%a %d %b %Y, %I:%M"
 
     @classmethod
     def from_element(cls, element: ElementTree.Element):
@@ -46,21 +46,17 @@ class Post:
         if content is not None:
             content = markdownify(content)
 
-        pub_date = element.find("pubDate", NAMESPACES).text
-
         try:
-            post_date = datetime.fromisoformat(
-                element.find("wp:post_date", NAMESPACES).text
-            )
+            date = datetime.fromisoformat(element.find("wp:post_date", NAMESPACES).text)
         except ValueError:
-            post_date = None
+            date = None
 
         try:
-            post_modified = datetime.fromisoformat(
+            modified = datetime.fromisoformat(
                 element.find("wp:post_modified", NAMESPACES).text
             )
         except ValueError:
-            post_modified = None
+            modified = None
 
         categories = [e.text for e in element.findall("category")]
         is_draft = element.find("wp:status", NAMESPACES).text == "draft"
@@ -70,9 +66,8 @@ class Post:
             name=name,
             id=id,
             content=content,
-            pub_date=pub_date,
-            post_date=post_date,
-            post_modified=post_modified,
+            date=date,
+            modified=modified,
             categories=categories,
             is_draft=is_draft,
         )
@@ -84,8 +79,8 @@ class Post:
         lines.append(f"id: {self.id}")
         lines.append("layout: post")
         lines.append(f"title: {self.title}")
-        lines.append(f"date: {self.post_date}")
-        lines.append(f"modified: {self.post_modified}")
+        lines.append(f"date: {self.date}")
+        lines.append(f"modified: {self.modified}")
         if len(self.categories) > 0:
             lines.append(f"categories: {self.categories}")
         if self.is_draft:
@@ -100,8 +95,8 @@ class Post:
         if self.title is not None and include_title:
             lines.append(f"# {self.title}")
             lines.append("")
-        if self.pub_date is not None and include_date:
-            lines.append(f"_{self.pub_date}_")
+        if self.date is not None and include_date:
+            lines.append(f"_{self.date.strftime(self.DATE_IN_BODY_FORMAT)}_")
             lines.append("")
         if self.content is not None:
             lines.append(f"{self.content}")

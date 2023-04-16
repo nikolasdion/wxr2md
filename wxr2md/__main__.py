@@ -27,7 +27,7 @@ def main(
         if post.is_draft:
             file = drafts_dir / f"{post.id}.md"
         else:
-            file = posts_dir / f"{post.post_date.date()}-{post.name}.md"
+            file = posts_dir / f"{post.date.date()}-{post.name}.md"
 
         file.write_text(
             post.to_md(
