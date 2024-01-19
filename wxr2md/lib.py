@@ -20,6 +20,8 @@ class Post:
 
     id: str
     """Unique ID of the post"""
+    type: str
+    """Type of blog entry, e.g. page or post"""
     title: str
     """Title of the post as displayed in the page, can be None"""
     name: str
@@ -31,8 +33,11 @@ class Post:
     modified: datetime
     """Date last modified, from wordpress metadata"""
     categories: list[str]
-    """List of categories/tags this post is associated with"""
-    is_draft: bool
+    """List of categories this post is associated with"""
+    tags: list[str]
+    """List of tags this post is associated with"""
+    draft: bool
+    """Whether this post is a draft"""
 
     DATE_IN_BODY_FORMAT = "%a %d %b %Y, %I:%M"
 
@@ -42,6 +47,8 @@ class Post:
         title = element.find("title").text
         name = element.find("wp:post_name", NAMESPACES).text
         id = element.find("wp:post_id", NAMESPACES).text
+        type = element.find("wp:post_type", NAMESPACES).text
+
         content = element.find("content:encoded", NAMESPACES).text
         if content is not None:
             content = markdownify(content)
@@ -58,18 +65,22 @@ class Post:
         except ValueError:
             modified = None
 
-        categories = [e.text for e in element.findall("category")]
-        is_draft = element.find("wp:status", NAMESPACES).text == "draft"
+        categories =  [e.text for e in element.findall("category") if e.get("domain") == "category"]
+        tags =  [e.text for e in element.findall("category") if e.get("domain") == "post_tag"]
+
+        draft = element.find("wp:status", NAMESPACES).text == "draft"
 
         return cls(
             title=title,
             name=name,
             id=id,
+            type=type,
             content=content,
             date=date,
             modified=modified,
             categories=categories,
-            is_draft=is_draft,
+            tags=tags,
+            draft=draft,
         )
 
     def md_frontmatter(self) -> str:
@@ -77,13 +88,15 @@ class Post:
         lines = []
         lines.append("---")
         lines.append(f"id: {self.id}")
-        lines.append("layout: post")
+        lines.append(f"type: {self.type}")
         lines.append(f"title: {self.title}")
         lines.append(f"date: {self.date}")
         lines.append(f"modified: {self.modified}")
         if len(self.categories) > 0:
             lines.append(f"categories: {self.categories}")
-        if self.is_draft:
+        if len(self.tags) > 0:
+            lines.append(f"tags: {self.tags}")
+        if self.draft:
             lines.append("draft: true")
         lines.append("---")
         lines.append("")

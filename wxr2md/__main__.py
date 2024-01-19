@@ -24,7 +24,7 @@ def main(
     drafts_dir.mkdir(exist_ok=True, parents=True)
 
     for post in blog.posts:
-        if post.is_draft:
+        if post.draft:
             file = drafts_dir / f"{post.id}.md"
         else:
             file = posts_dir / f"{post.date.date()}-{post.name}.md"
