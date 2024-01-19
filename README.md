@@ -1,6 +1,6 @@
 # wxr2md - Convert WXR Files into Markdown
 
-Convert WordPress exPort RSS (WXR) files to Markdown files.
+Convert WordPress exPort RSS (WXR) files to Markdown files with YAML frontmatter.
 
 ## Installation
 

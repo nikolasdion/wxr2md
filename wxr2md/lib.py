@@ -4,6 +4,7 @@ from pathlib import Path
 from xml.etree import ElementTree
 
 from markdownify import markdownify
+from yaml import dump
 
 NAMESPACES = {
     "content": "http://purl.org/rss/1.0/modules/content/",
@@ -18,7 +19,7 @@ NAMESPACES = {
 class Post:
     """Represents a WordPress blogpost"""
 
-    id: str
+    id: int
     """Unique ID of the post"""
     type: str
     """Type of blog entry, e.g. page or post"""
@@ -46,7 +47,7 @@ class Post:
         """Create a post from an XML element"""
         title = element.find("title").text
         name = element.find("wp:post_name", NAMESPACES).text
-        id = element.find("wp:post_id", NAMESPACES).text
+        id = int(element.find("wp:post_id", NAMESPACES).text)
         type = element.find("wp:post_type", NAMESPACES).text
 
         content = element.find("content:encoded", NAMESPACES).text
@@ -83,24 +84,30 @@ class Post:
             draft=draft,
         )
 
-    def md_frontmatter(self) -> str:
-        """Generate YAML metadata lines to be included in the markdown string"""
-        lines = []
-        lines.append("---")
-        lines.append(f"id: {self.id}")
-        lines.append(f"type: {self.type}")
-        lines.append(f"title: {self.title}")
-        lines.append(f"date: {self.date}")
-        lines.append(f"modified: {self.modified}")
+    def get_frontmatter(self) -> str:
+        """Generate YAML frontmatter"""
+
+        frontmatter = {
+            "id": self.id,
+            "title": self.title,
+            "type": self.type,
+            "date": self.date,
+            "modified": self.modified,
+            # "categories": self.categories,
+            # "tags": self.tags,
+            # "draft": self. draft
+        }
+
         if len(self.categories) > 0:
-            lines.append(f"categories: {self.categories}")
+            frontmatter["categories"] = self.categories
+        
         if len(self.tags) > 0:
-            lines.append(f"tags: {self.tags}")
+            frontmatter["categories"] = self.tags
+
         if self.draft:
-            lines.append("draft: true")
-        lines.append("---")
-        lines.append("")
-        return "\n".join(lines)
+            frontmatter["draft"] = self.draft
+
+        return dump(frontmatter, sort_keys=False)
 
     def md_body(self, include_title=False, include_date=False) -> str:
         """Generate markdown text body lines"""
@@ -125,8 +132,9 @@ class Post:
         """Convert post into a markdown string"""
         md = ""
         if frontmatter:
-            md += self.md_frontmatter()
-            md += "\n"
+            md += "---\n"
+            md += self.get_frontmatter()
+            md += "---\n\n"
         md += self.md_body(title_in_body, date_in_body)
         return md
 

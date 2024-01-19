@@ -12,6 +12,7 @@ repository = "https://github.com/nikolasdion/wxr2md"
 [tool.poetry.dependencies]
 python = "^3.11"
 markdownify = "^0.11.6"
+pyyaml = "^6.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
