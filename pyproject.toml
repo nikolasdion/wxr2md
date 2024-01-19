@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wxr2md"
-version = "0.2.0"
+version = "0.3.0"
 description = "Converter for WordPress eXport RSS (WXR) files into Markdown files"
 authors = ["Dion Susanto <nikolasdion@gmail.com>"]
 readme = "README.md"
