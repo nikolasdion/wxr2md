@@ -32,15 +32,21 @@ options:
 
 By default, the script will output to `out/` folder in the current working directory.
 
-The markdown file output is as follows:
+The markdown file output is as follows. The frontmatter mostly follows the frontmatter properties of [Hugo](https://gohugo.io/), except for `id`.
 
 ```markdown
 ---
 id: 1
 title: Hello, world!
 date: 1970-01-01 12:34:56
-modified: 1980-02-02 01:02:03
-categories: ["a category", "another category"]
+lastmod: 1980-02-02 01:02:03
+categories:
+  - a category
+  - another category
+tags:
+  - this is a tag
+  - thisisalsoatag
+draft: true
 ---
 
 # Hello, world! <!-- If passing in --title-in-body argument -->
@@ -53,7 +59,7 @@ This is the content of the blog post.
 ## Limitations:
 
 - only tested with WXR version 1.2 and a limited set of exports, so might not be compatible for all WXR files
-- `date` and `modified` is in local timezone and does not include timezone data
+- `date` and `lastmod` is in local timezone and does not include timezone data
 - blog information is not outputed anywhere (e.g. description, url, etc)
 - no option to customise the output file names and folder structures
 

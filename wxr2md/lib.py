@@ -4,7 +4,7 @@ from pathlib import Path
 from xml.etree import ElementTree
 
 from markdownify import markdownify
-from yaml import dump
+from yaml import dump as dump_to_yaml
 
 NAMESPACES = {
     "content": "http://purl.org/rss/1.0/modules/content/",
@@ -31,7 +31,7 @@ class Post:
     """Content, in markdown format"""
     date: datetime
     """Date posted, from wordpress metadata"""
-    modified: datetime
+    lastmod: datetime
     """Date last modified, from wordpress metadata"""
     categories: list[str]
     """List of categories this post is associated with"""
@@ -60,11 +60,11 @@ class Post:
             date = None
 
         try:
-            modified = datetime.fromisoformat(
+            lastmod = datetime.fromisoformat(
                 element.find("wp:post_modified", NAMESPACES).text
             )
         except ValueError:
-            modified = None
+            lastmod = None
 
         categories =  [e.text for e in element.findall("category") if e.get("domain") == "category"]
         tags =  [e.text for e in element.findall("category") if e.get("domain") == "post_tag"]
@@ -78,7 +78,7 @@ class Post:
             type=type,
             content=content,
             date=date,
-            modified=modified,
+            lastmod=lastmod,
             categories=categories,
             tags=tags,
             draft=draft,
@@ -92,10 +92,7 @@ class Post:
             "title": self.title,
             "type": self.type,
             "date": self.date,
-            "modified": self.modified,
-            # "categories": self.categories,
-            # "tags": self.tags,
-            # "draft": self. draft
+            "lastmod": self.lastmod,
         }
 
         if len(self.categories) > 0:
@@ -107,7 +104,7 @@ class Post:
         if self.draft:
             frontmatter["draft"] = self.draft
 
-        return dump(frontmatter, sort_keys=False)
+        return dump_to_yaml(frontmatter, sort_keys=False)
 
     def md_body(self, include_title=False, include_date=False) -> str:
         """Generate markdown text body lines"""
