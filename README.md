@@ -24,7 +24,7 @@ options:
   -h, --help        show this help message and exit
   --output OUTPUT   output directory, defaults to 'out/' in the current working directory
   --no-frontmatter  don't add YAML frontmatter to the markdown file
-  --title-in-body   add title in the markdown body as an Header element
+  --title-in-body   add title in the markdown body as an h1 element
   --date-in-body    print date at the start of the markdown body
 ```
 
@@ -38,14 +38,15 @@ The markdown file output is as follows. The frontmatter mostly follows the front
 ---
 id: 1
 title: Hello, world!
+type: post
 date: 1970-01-01 12:34:56
 lastmod: 1980-02-02 01:02:03
 categories:
   - a category
   - another category
 tags:
-  - this is a tag
-  - thisisalsoatag
+  - my tag
+  - your tag
 draft: true
 ---
 
@@ -53,14 +54,14 @@ draft: true
 
 _Mon 01 Jan 1970, 12:34_ <!-- If passing in --date-in-body argument -->
 
-This is the content of the blog post.
+This is the content of the blog post. Perhaps there are a few sentences here.
 ```
 
 ## Limitations:
 
 - only tested with WXR version 1.2 and a limited set of exports, so might not be compatible for all WXR files
 - `date` and `lastmod` is in local timezone and does not include timezone data
-- blog information is not outputed anywhere (e.g. description, url, etc)
+- blog information is not outputed anywhere (e.g. description, url, etc.)
 - no option to customise the output file names and folder structures
 
 ## Building
