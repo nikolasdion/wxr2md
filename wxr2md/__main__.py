@@ -20,14 +20,11 @@ def main(
     posts_dir = out_dir / "posts"
     posts_dir.mkdir(exist_ok=True, parents=True)
 
-    drafts_dir = out_dir / "drafts"
-    drafts_dir.mkdir(exist_ok=True, parents=True)
-
     for post in blog.posts:
-        if post.draft:
-            file = drafts_dir / f"{post.id}.md"
-        else:
+        if post.type == "post":
             file = posts_dir / f"{post.date.date()}-{post.name}.md"
+        else:
+            file = out_dir / f"{post.name}.md"
 
         file.write_text(
             post.to_md(
